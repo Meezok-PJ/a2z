@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block body_class %}page-landing{% endblock %}
+{% block shell_class %}app-shell--landing{% endblock %}
+{% block head_extras %}
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="landing-page">
+  <header class="landing-header">
+    <a class="landing-logo-link" href="/" aria-label="A2Z home">
+      <img class="landing-logo" src="{{ url_for('web.branding_logo') }}" alt="Project A2Z logo">
+    </a>
+    <nav class="landing-nav" aria-label="Primary">
+      <a class="landing-nav-link" href="#unlock-story">How It Works</a>
+      <a class="landing-nav-link" href="#benefits">Why A2Z</a>
+      <a class="landing-nav-link" href="#architecture">Architecture</a>
+      <a class="landing-nav-link" href="/presentation">Presentation</a>
+      <a class="vault-primary-btn landing-login-btn" href="/login">
+        <span>Sign In</span>
+        <i data-feather="arrow-right" aria-hidden="true"></i>
+      </a>
+    </nav>
+  </header>
+
+  <section class="landing-hero">
+    <div class="landing-eyebrow">
+      <span class="landing-eyebrow-dot" aria-hidden="true"></span>
+      <span>Zero-Knowledge Organizational Security</span>
+    </div>
+    <h1>
+      Your secrets stays with you.
+      <span class="landing-headline-accent">Not even our server can read them.</span>
+    </h1>
+    <p class="landing-subtext">
+      A2Z is an organizational password manager built on a strict zero-trust architecture.
+      All encryption happens client-side using Argon2 key derivation and AES-256-GCM,
+      ensuring the server stores only ciphertext.It doesn't know your master password, never your plaintext secrets.
+    </p>
+    <div class="landing-hero-actions">
+      <a class="vault-primary-btn landing-cta-primary" href="/login">
+        <span>Enter Vault</span>
+        <i data-feather="arrow-right" aria-hidden="true"></i>
+      </a>
+      <a class="vault-secondary-btn landing-cta-secondary" href="#unlock-story">
+        <i data-feather="play-circle" aria-hidden="true"></i>
+        <span>See How It Works</span>
+      </a>
+    </div>
+
+    <ul class="landing-trust-row" aria-label="Highlights">
+      <li><i data-feather="cpu" aria-hidden="true"></i><span>Argon2id key derivation</span></li>
+      <li><i data-feather="shield" aria-hidden="true"></i><span>AES-256-GCM encryption</span></li>
+      <li><i data-feather="lock" aria-hidden="true"></i><span>PBKDF2 server hashing</span></li>
+      <li><i data-feather="globe" aria-hidden="true"></i><span>HSTS + COOP/CORP headers</span></li>
+    </ul>
+  </section>
+
+  <section id="unlock-story" class="landing-story" aria-label="Vault unlock timeline">
+    <div class="landing-story-visual" data-story-visual>
+      <div class="landing-visual-meta">
+        <span class="landing-visual-step" data-stage-step>Step 1 / 4</span>
+        <span class="landing-visual-status" data-stage-label>Vault locked</span>
+      </div>
+
+      <div class="landing-vault-shell" aria-hidden="true">
+        <div class="landing-vault-halo"></div>
+        <div class="landing-vault-ring">
+          <div class="landing-vault-ring-inner"></div>
+          <div class="landing-vault-center">
+            <i data-feather="lock" class="landing-stage-icon" data-stage-icon aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-vault-progress" aria-hidden="true">
+        <span class="landing-vault-progress-fill" data-progress-fill></span>
+      </div>
+
+      <p class="landing-visual-hint">Scroll to advance</p>
+    </div>
+
+    <ol class="landing-story-steps">
+      <li class="landing-step" data-stage="locked">
+        <div class="landing-step-index" aria-hidden="true">01</div>
+        <div class="landing-step-body">
+          <h2>Vault Sealed</h2>
+          <p>All credentials are encrypted at rest with AES-256-GCM. Without your master password, the data is mathematically indecipherable — even to us.</p>
+        </div>
+        <i class="landing-step-icon" data-feather="lock" aria-hidden="true"></i>
+      </li>
+      <li class="landing-step" data-stage="auth">
+        <div class="landing-step-index" aria-hidden="true">02</div>
+        <div class="landing-step-body">
+          <h2>Argon2 Key Derivation</h2>
+          <p>Your master password is processed through Argon2id (memory-hard, 64KB memory cost) entirely in the browser. It produces two keys: an AuthKey for login and a MasterEncryptionKey that never leaves your device.</p>
+        </div>
+        <i class="landing-step-icon" data-feather="cpu" aria-hidden="true"></i>
+      </li>
+      <li class="landing-step" data-stage="decrypt">
+        <div class="landing-step-index" aria-hidden="true">03</div>
+        <div class="landing-step-body">
+          <h2>Server-Side Zero Trust</h2>
+          <p>The server receives only the AuthKey, then applies PBKDF2-HMAC-SHA256 with 200,000 iterations and a random 16-byte salt before storage. Even a full database breach yields zero usable credentials.</p>
+        </div>
+        <i class="landing-step-icon" data-feather="shield" aria-hidden="true"></i>
+      </li>
+      <li class="landing-step" data-stage="open">
+        <div class="landing-step-index" aria-hidden="true">04</div>
+        <div class="landing-step-body">
+          <h2>Client-Side Decryption</h2>
+          <p>Vault records are decrypted in your browser using AES-256-GCM with the MasterEncryptionKey. The server only stores ciphertext blobs and IVs — it can never reconstruct your data.</p>
+        </div>
+        <i class="landing-step-icon" data-feather="unlock" aria-hidden="true"></i>
+      </li>
+    </ol>
+  </section>
+
+  <section id="benefits" class="landing-benefits" aria-label="Why teams pick A2Z">
+    <header class="landing-benefits-header">
+      <p class="landing-section-eyebrow">Why A2Z</p>
+      <h2>Cryptographic security that doesn't compromise usability.</h2>
+      <p class="landing-section-sub">
+        Built on proven cryptographic primitives and a strict zero-trust boundary between your browser and our server.
+      </p>
+    </header>
+
+    <div class="landing-benefits-grid">
+      <article class="landing-benefit-card">
+        <span class="landing-benefit-icon landing-benefit-icon--purple" aria-hidden="true">
+          <i data-feather="lock"></i>
+        </span>
+        <h3>Zero-knowledge encryption</h3>
+        <p>The Web Crypto API handles AES-256-GCM encryption entirely in your browser. The server stores ciphertext only — no plaintext, no master password exposure. A database breach yields zero usable data.</p>
+      </article>
+
+      <article class="landing-benefit-card">
+        <span class="landing-benefit-icon landing-benefit-icon--blue" aria-hidden="true">
+          <i data-feather="share-2"></i>
+        </span>
+        <h3>Department sharing + audit</h3>
+        <p>Share credentials within your department using derived symmetric keys. Every action is logged. Admins can track access patterns and revoke permissions instantly when teams change.</p>
+      </article>
+
+      <article class="landing-benefit-card">
+        <span class="landing-benefit-icon landing-benefit-icon--red" aria-hidden="true">
+          <i data-feather="smartphone"></i>
+        </span>
+        <h3>Adaptive TOTP 2FA</h3>
+        <p>Even if an attacker extracts your keys, they cannot authenticate from another device without your physical TOTP token. Multi-factor authentication adds a critical defense-in-depth layer.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="architecture" class="landing-benefits" aria-label="Security architecture">
+    <header class="landing-benefits-header">
+      <p class="landing-section-eyebrow">Architecture</p>
+      <h2>Defense in depth, by design.</h2>
+      <p class="landing-section-sub">
+        From memory-hard key derivation to strict transport security — every layer is deliberately hardened.
+      </p>
+    </header>
+
+    <div class="landing-benefits-grid">
+      <article class="landing-benefit-card">
+        <span class="landing-benefit-icon landing-benefit-icon--purple" aria-hidden="true">
+          <i data-feather="cpu"></i>
+        </span>
+        <h3>Argon2id + PBKDF2 layering</h3>
+        <p>Client-side Argon2id (memory-hard) derives keys that the server then re-hashes with PBKDF2 (200K iterations). An attacker must defeat both to compromise a single account.</p>
+      </article>
+
+      <article class="landing-benefit-card">
+        <span class="landing-benefit-icon landing-benefit-icon--blue" aria-hidden="true">
+          <i data-feather="globe"></i>
+        </span>
+        <h3>Strict transport layer</h3>
+        <p>Nginx enforces TLSv1.2/1.3 only, with HSTS, X-Frame-Options DENY, and Cross-Origin Opener/Resource Policies (COOP/CORP) to isolate the browsing context and protect ephemeral keys.</p>
+      </article>
+
+      <article class="landing-benefit-card">
+        <span class="landing-benefit-icon landing-benefit-icon--red" aria-hidden="true">
+          <i data-feather="check-circle"></i>
+        </span>
+        <h3>Authenticated encryption (GCM)</h3>
+        <p>AES-GCM provides authenticated encryption — any tampered ciphertext in the database fails the authentication tag check during decryption, immediately alerting the client to data integrity violations.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="landing-benefits">
+    <div class="landing-final-cta">
+      <div>
+        <p class="landing-section-eyebrow">Ready to protect your organization?</p>
+        <h2>Step in and unlock your vault.</h2>
+      </div>
+      <a class="vault-primary-btn landing-cta-primary" href="/login">
+        <span>Enter Vault</span>
+        <i data-feather="arrow-right" aria-hidden="true"></i>
+      </a>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <span>&copy; A2Z Vault</span>
+    <span class="landing-footer-dot" aria-hidden="true">&middot;</span>
+    <span>Zero-knowledge by design, department-ready by default</span>
+  </footer>
+</div>
+
+<script defer src="{{ url_for('static', filename='js/landing.js') }}"></script>
+{% endblock %}

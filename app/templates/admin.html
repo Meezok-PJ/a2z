@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% block body_class %}page-admin{% endblock %}
+{% block shell_class %}app-shell--dashboard{% endblock %}
+{% block head_extras %}
+<script src="https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2-bundled.min.js" integrity="sha384-XOR3aNvHciLPIf6r+2glkrmbBbLmIJ1EChMXjw8eBKBf8gE0rDq1TyUNuRdorOqi" crossorigin="anonymous"></script>
+{% endblock %}
+{% block content %}
+<div class="vault-dashboard admin-dashboard">
+  <header class="vault-nav">
+    <div class="vault-nav-left">
+      <button type="button" class="vault-secondary-btn vault-icon-btn vault-sidebar-toggle" data-sidebar-toggle aria-label="Toggle sidebar" title="Toggle sidebar" aria-expanded="true">
+        <i data-feather="sidebar" aria-hidden="true"></i>
+      </button>
+      <a class="vault-logo-link" href="/admin" aria-label="Project A2Z">
+        <img class="vault-logo-image" src="{{ url_for('web.branding_logo') }}" alt="Project A2Z Logo">
+      </a>
+      <nav class="vault-tabs" aria-label="Admin Sections">
+        <a class="vault-tab vault-tab-active" href="/admin">Admin</a>
+        <a class="vault-tab tab-with-icon" href="/security">
+          <i data-feather="shield" aria-hidden="true"></i>
+          <span>Security</span>
+        </a>
+        <span class="vault-tab-underline" aria-hidden="true"></span>
+      </nav>
+    </div>
+
+    <div class="vault-nav-center">
+      <div class="vault-search">
+        <span class="vault-search-icon" aria-hidden="true">⌕</span>
+        <input id="admin-search" type="search" placeholder="Search users..." autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <div class="vault-nav-right">
+      <button type="button" class="vault-secondary-btn vault-icon-btn theme-toggle-btn" data-theme-toggle title="Toggle theme" aria-label="Enable dark mode">
+        <i data-feather="moon" aria-hidden="true"></i>
+      </button>
+      <button id="admin-logout" type="button" class="vault-secondary-btn btn-with-icon">
+        <i data-feather="log-out" aria-hidden="true"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-mobile-guard" role="status" aria-live="polite">
+    <h2>Admin dashboard is desktop-only</h2>
+    <p>Use a larger screen to manage users, shared services, and audit views.</p>
+  </div>
+
+  <div class="vault-body">
+    <aside class="vault-sidebar" aria-label="Admin Sidebar">
+      <div class="vault-sentinel">
+        <div class="vault-sentinel-badge" aria-hidden="true">A</div>
+        <div class="vault-sentinel-meta">
+          <div class="vault-sentinel-name">Admin Console</div>
+          <div class="vault-sentinel-sub">Zero-Trust Operations</div>
+        </div>
+      </div>
+
+      <nav class="vault-side-nav" aria-label="Admin Views">
+        <button class="vault-side-item active" type="button" data-view="users">
+          <i data-feather="users" aria-hidden="true"></i>
+          <span>Users</span>
+        </button>
+        <button class="vault-side-item" type="button" data-view="requests">
+          <i data-feather="bell" aria-hidden="true"></i>
+          <span>Requests</span>
+        </button>
+        <button class="vault-side-item" type="button" data-view="vaults">
+          <i data-feather="database" aria-hidden="true"></i>
+          <span>Manage Vaults</span>
+        </button>
+        <button class="vault-side-item" type="button" data-view="bulk">
+          <i data-feather="upload-cloud" aria-hidden="true"></i>
+          <span>Bulk Init</span>
+        </button>
+      </nav>
+
+      <div class="vault-sidebar-spacer"></div>
+    </aside>
+
+    <section class="vault-content" aria-label="Admin Content">
+      <div id="users-panel" class="admin-view">
+        <div class="vault-content-header">
+          <div>
+            <h1 class="vault-title">Admin Dashboard</h1>
+            <p class="vault-subtitle">Create users and assign primary departments.</p>
+          </div>
+        </div>
+
+        <div class="admin-panel-card">
+          <h2 class="admin-panel-title panel-title-with-icon">
+            <i data-feather="user-plus" aria-hidden="true"></i>
+            <span>Create User</span>
+          </h2>
+          <form id="create-user-form" class="admin-create-form" autocomplete="off">
+            <label class="vault-field admin-field">
+              <span>Username</span>
+              <input id="new-username" type="text" placeholder="e.g. j.doe" required>
+            </label>
+
+            <label class="vault-field admin-field">
+              <span>Department</span>
+              <span class="admin-select-wrap">
+                <div id="new-department-dropdown" class="custom-dropdown" tabindex="0">
+                  <div class="custom-dropdown-trigger">
+                    <span class="custom-dropdown-value">Select department</span>
+                    <span class="admin-select-caret" aria-hidden="true">▾</span>
+                  </div>
+                  <div class="custom-dropdown-options" id="new-department-options"></div>
+                  <input type="hidden" id="new-department" required>
+                </div>
+              </span>
+            </label>
+
+            <button type="submit" class="vault-primary-btn btn-with-icon">
+              <i data-feather="user-plus" aria-hidden="true"></i>
+              <span>Create User</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="admin-panel-card">
+          <h2 class="admin-panel-title">Managed Users</h2>
+          <div id="users-list" class="admin-list"></div>
+        </div>
+      </div>
+
+      <div id="requests-panel" class="admin-view hidden">
+        <div class="vault-content-header">
+          <div>
+            <h1 class="vault-title title-with-icon">
+              <i data-feather="shield" aria-hidden="true"></i>
+              <span>Recovery Requests</span>
+            </h1>
+            <p class="vault-subtitle">Approve or decline pending recovery actions.</p>
+          </div>
+        </div>
+        <div class="admin-panel-card">
+          <h2 class="admin-panel-title">MFA Reset Requests</h2>
+          <div id="requests-list" class="admin-list"></div>
+        </div>
+        <div class="admin-panel-card">
+          <h2 class="admin-panel-title">Account Reset Requests</h2>
+          <p class="vault-subtitle">Approval resets master password + recovery factors and forces FTL again.</p>
+          <div id="account-reset-requests-list" class="admin-list"></div>
+        </div>
+      </div>
+
+      <div id="vaults-panel" class="admin-view hidden" data-inner-tab="shared">
+        <div class="vault-content-header">
+          <div>
+            <h1 class="vault-title">Manage Vaults</h1>
+            <p class="vault-subtitle">Encrypted department services.</p>
+          </div>
+        </div>
+        <div class="admin-panel-card">
+          <label class="vault-field admin-field">
+            <span>Department</span>
+            <span class="admin-select-wrap">
+              <div id="vault-department-dropdown" class="custom-dropdown" tabindex="0">
+                <div class="custom-dropdown-trigger">
+                  <span class="custom-dropdown-value">Select department</span>
+                  <span class="admin-select-caret" aria-hidden="true">▾</span>
+                </div>
+                <div class="custom-dropdown-options" id="vault-department-options"></div>
+                <input type="hidden" id="vault-department-id" required>
+              </div>
+            </span>
+          </label>
+        </div>
+
+        <div class="admin-vault-sections">
+          <div class="admin-inner-tabs" role="tablist" aria-label="Manage Vaults Sections">
+            <button type="button" class="admin-inner-tab is-active" data-vault-tab="shared" role="tab" aria-selected="true">
+              <i data-feather="server" aria-hidden="true"></i>
+              <span>Shared Services</span>
+            </button>
+            <button type="button" class="admin-inner-tab" data-vault-tab="audit" role="tab" aria-selected="false">
+              <i data-feather="activity" aria-hidden="true"></i>
+              <span>User Audit</span>
+            </button>
+          </div>
+
+          <div class="vault-inner-tab-panel" data-tab-panel="shared">
+            <div class="admin-panel-card">
+              <form id="vault-service-form" class="admin-create-form" autocomplete="off">
+              <label class="vault-field admin-field">
+                <span>Service Name</span>
+                <input id="vault-service-name" type="text" required>
+              </label>
+              <label class="vault-field admin-field">
+                <span>Username</span>
+                <input id="vault-service-username" type="text" required>
+              </label>
+              <label class="vault-field admin-field">
+                <span>URL (Optional)</span>
+                <input id="vault-service-url" type="url" placeholder="https://">
+              </label>
+              <label class="vault-field admin-field">
+                <span>Password</span>
+                <div class="credential-password">
+                  <input id="vault-service-password" type="password" required>
+                  <button type="button" class="credential-eye" id="admin-service-pw-toggle" title="Toggle password visibility" aria-label="Toggle password visibility">
+                    <i data-feather="eye" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </label>
+              <button type="submit" class="vault-primary-btn">Save Service</button>
+              </form>
+            </div>
+            <div class="admin-panel-card">
+              <h2 class="admin-panel-title">Department Services</h2>
+              <div id="vault-services-list" class="admin-list"></div>
+            </div>
+          </div>
+
+          <div class="vault-inner-tab-panel" data-tab-panel="audit">
+            <div class="admin-panel-card">
+              <h2 class="admin-panel-title">Assigned Users (Selected Department)</h2>
+              <div class="admin-audit-toolbar">
+                <label class="admin-audit-search-wrap" for="vault-user-search">
+                  <span class="vault-search-icon" aria-hidden="true">⌕</span>
+                  <input id="vault-user-search" type="search" placeholder="Search assigned users..." autocomplete="off" spellcheck="false">
+                </label>
+              </div>
+              <div id="vault-department-users" class="admin-list admin-audit-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p id="admin-message" class="message"></p>
+
+      <div id="bulk-panel" class="admin-view hidden">
+        <div class="vault-content-header">
+          <div>
+            <h1 class="vault-title title-with-icon">
+              <i data-feather="upload-cloud" aria-hidden="true"></i>
+              <span>Bulk Initialization</span>
+            </h1>
+            <p class="vault-subtitle">Upload a CSV file to create users and departments in one step. Secured by admin password.</p>
+          </div>
+        </div>
+
+        <div class="bulk-init-section">
+          <div class="admin-panel-card">
+            <h2 class="admin-panel-title panel-title-with-icon">
+              <i data-feather="file-text" aria-hidden="true"></i>
+              <span>CSV Upload</span>
+            </h2>
+
+            <button type="button" id="bulk-download-template" class="bulk-template-link">
+              <i data-feather="download" aria-hidden="true"></i>
+              <span>Download CSV template</span>
+            </button>
+
+            <div id="bulk-dropzone" class="bulk-dropzone">
+              <div class="bulk-dropzone-icon">
+                <i data-feather="upload" aria-hidden="true"></i>
+              </div>
+              <div class="bulk-dropzone-title">Drop your CSV here or click to browse</div>
+              <div class="bulk-dropzone-sub">Expected columns: <code>username, department</code></div>
+              <input type="file" id="bulk-file-input" accept=".csv,text/csv" aria-label="Upload CSV file">
+            </div>
+
+            <div id="bulk-file-info" class="bulk-file-info hidden">
+              <div class="bulk-file-info-icon">
+                <i data-feather="file" aria-hidden="true"></i>
+              </div>
+              <div class="bulk-file-meta">
+                <div id="bulk-file-name" class="bulk-file-name">-</div>
+                <div id="bulk-file-size" class="bulk-file-size">-</div>
+              </div>
+              <button type="button" id="bulk-file-remove" class="vault-secondary-btn bulk-file-remove" title="Remove file" aria-label="Remove file">
+                <i data-feather="x" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="bulk-preview-card" class="admin-panel-card hidden">
+            <h2 class="admin-panel-title panel-title-with-icon">
+              <i data-feather="eye" aria-hidden="true"></i>
+              <span>Preview</span>
+            </h2>
+            <div id="bulk-preview-wrap" class="bulk-preview-wrap"></div>
+            <div class="bulk-actions" style="margin-top:var(--sp-4)">
+              <button type="button" id="bulk-upload-btn" class="vault-primary-btn btn-with-icon">
+                <i data-feather="upload-cloud" aria-hidden="true"></i>
+                <span>Upload &amp; Create</span>
+              </button>
+              <button type="button" id="bulk-cancel-btn" class="vault-secondary-btn">Cancel</button>
+            </div>
+          </div>
+
+          <div id="bulk-progress-card" class="admin-panel-card hidden">
+            <h2 class="admin-panel-title">Processing...</h2>
+            <div class="bulk-progress">
+              <div id="bulk-progress-fill" class="bulk-progress-fill"></div>
+            </div>
+          </div>
+
+          <div id="bulk-results-card" class="admin-panel-card hidden">
+            <h2 class="admin-panel-title panel-title-with-icon">
+              <i data-feather="check-circle" aria-hidden="true"></i>
+              <span>Results</span>
+            </h2>
+            <div id="bulk-results" class="bulk-results"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script defer src="{{ url_for('static', filename='js/crypto.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

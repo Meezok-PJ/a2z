@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block body_class %}page-vault{% endblock %}
+{% block shell_class %}app-shell--dashboard{% endblock %}
+{% block head_extras %}
+<script src="https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2-bundled.min.js" integrity="sha384-XOR3aNvHciLPIf6r+2glkrmbBbLmIJ1EChMXjw8eBKBf8gE0rDq1TyUNuRdorOqi" crossorigin="anonymous"></script>
+{% endblock %}
+{% block content %}
+<div class="vault-dashboard">
+  <header class="vault-nav">
+    <div class="vault-nav-left">
+      <button type="button" class="vault-secondary-btn vault-icon-btn vault-sidebar-toggle" data-sidebar-toggle aria-label="Toggle sidebar" title="Toggle sidebar" aria-expanded="true">
+        <i data-feather="sidebar" aria-hidden="true"></i>
+      </button>
+      <a class="vault-logo-link" href="/vault" aria-label="Project A2Z">
+        <img class="vault-logo-image" src="{{ url_for('web.branding_logo') }}" alt="Project A2Z Logo">
+      </a>
+      <nav class="vault-tabs" aria-label="Vault Sections">
+        <a class="vault-tab vault-tab-active tab-with-icon" href="/vault">
+          <i data-feather="lock" aria-hidden="true"></i>
+          <span>Vault</span>
+        </a>
+        <a class="vault-tab tab-with-icon" href="/security">
+          <i data-feather="shield" aria-hidden="true"></i>
+          <span>Security</span>
+        </a>
+        <span class="vault-tab-underline" aria-hidden="true"></span>
+      </nav>
+    </div>
+    <div class="vault-nav-center">
+      <div class="vault-search">
+        <span class="vault-search-icon" aria-hidden="true">⌕</span>
+        <input id="vault-search" type="search" placeholder="Search services..." autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+    <div class="vault-nav-right">
+      <button type="button" class="vault-secondary-btn vault-icon-btn theme-toggle-btn" data-theme-toggle title="Toggle theme" aria-label="Enable dark mode">
+        <i data-feather="moon" aria-hidden="true"></i>
+      </button>
+      <button id="vault-lock-toggle" type="button" class="vault-secondary-btn vault-icon-btn" title="Unlock vault" aria-label="Unlock vault">
+        <i data-feather="lock" aria-hidden="true"></i>
+      </button>
+      <button id="vault-logout" type="button" class="vault-secondary-btn btn-with-icon">
+        <i data-feather="log-out" aria-hidden="true"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="vault-body">
+    <aside class="vault-sidebar" aria-label="Vault Sidebar">
+      <div class="vault-sentinel">
+        <div class="vault-sentinel-badge" aria-hidden="true" id="vault-user-badge">V</div>
+        <div class="vault-sentinel-meta">
+          <div class="vault-sentinel-name" id="vault-user-name">Private + Shared Access</div>
+          <div class="vault-sentinel-sub" id="vault-department-label">Dept: <span id="vault-department">-</span></div>
+        </div>
+      </div>
+
+      <nav class="vault-side-nav" aria-label="Vault Views">
+        <button class="vault-side-item active" type="button" data-filter="all">
+          <i data-feather="grid" aria-hidden="true"></i>
+          <span>All</span>
+        </button>
+        <button class="vault-side-item" type="button" data-filter="shared">
+          <i data-feather="share-2" aria-hidden="true"></i>
+          <span>Shared</span>
+        </button>
+        <button class="vault-side-item" type="button" data-filter="favorites">
+          <i data-feather="star" aria-hidden="true"></i>
+          <span>Favourites</span>
+        </button>
+      </nav>
+
+      <div class="vault-sidebar-spacer"></div>
+      <button id="vault-add-service" type="button" class="vault-primary-btn vault-lock-btn btn-with-icon">
+        <i data-feather="plus-circle" aria-hidden="true"></i>
+        <span>Add Service</span>
+      </button>
+    </aside>
+
+    <section class="vault-content" aria-label="User Vault">
+      <div class="vault-content-header">
+        <div>
+          <h1 class="vault-title">Vault</h1>
+        </div>
+      </div>
+
+      <div class="vault-unlock vault-unlock-status">
+        <div id="vault-decrypt-progress" class="vault-decrypt-progress hidden" role="status" aria-live="polite">
+          <span class="vault-decrypt-label">Decrypting vault credentials...</span>
+          <div class="vault-decrypt-bar" aria-hidden="true">
+            <span id="vault-decrypt-progress-fill" class="vault-decrypt-progress-fill"></span>
+          </div>
+        </div>
+        <p id="vault-message" class="message vault-message"></p>
+      </div>
+
+      <div class="vault-explorer">
+        <div id="vault-grid" class="vault-grid" aria-label="Credential Grid"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="unlock-modal" class="vault-modal hidden" role="dialog" aria-modal="true" aria-labelledby="unlock-modal-title">
+  <div class="vault-modal-backdrop" data-close-unlock="true"></div>
+  <div class="vault-modal-panel">
+    <h2 id="unlock-modal-title">Unlock Vault</h2>
+    <form id="unlock-form" class="vault-modal-form" autocomplete="off">
+      <label class="vault-field">
+        <span>Master Password</span>
+        <input id="unlock-password" type="password" autocomplete="current-password" required>
+      </label>
+      <div class="vault-modal-actions">
+        <button type="button" id="unlock-cancel" class="vault-secondary-btn">Cancel</button>
+        <button type="submit" class="vault-primary-btn">
+          <span>Decrypt</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="service-modal" class="vault-modal hidden" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
+  <div class="vault-modal-backdrop" data-close-service="true"></div>
+  <div class="vault-modal-panel">
+    <h2 id="service-modal-title">Add Private Service</h2>
+    <form id="service-form" class="vault-modal-form" autocomplete="off">
+      <div id="service-scope-toggle" class="service-scope-toggle">
+        <button type="button" class="scope-option active" data-scope="private">
+          <i data-feather="lock" aria-hidden="true"></i>
+          <span>Private</span>
+        </button>
+        <button type="button" class="scope-option" data-scope="shared">
+          <i data-feather="share-2" aria-hidden="true"></i>
+          <span>Share with Dept</span>
+        </button>
+      </div>
+      <label class="vault-field">
+        <span>Service Name</span>
+        <input id="service-name" type="text" required>
+      </label>
+      <label class="vault-field">
+        <span>Username</span>
+        <input id="service-username" type="text" required>
+      </label>
+      <label class="vault-field">
+        <span>URL (Optional)</span>
+        <input id="service-url" type="url" placeholder="https://">
+      </label>
+      <label class="vault-field">
+        <span>Password</span>
+        <div class="credential-password">
+          <input id="service-password" type="password" required>
+          <button type="button" class="credential-eye" id="service-password-toggle" title="Toggle password visibility" aria-label="Toggle password visibility">
+            <i data-feather="eye" aria-hidden="true"></i>
+          </button>
+        </div>
+      </label>
+      <div class="vault-modal-actions">
+        <button type="button" id="service-cancel" class="vault-secondary-btn">Cancel</button>
+        <button type="submit" id="service-submit" class="vault-primary-btn">
+          <span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script defer src="{{ url_for('static', filename='js/crypto.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/vault.js') }}"></script>
+{% endblock %}

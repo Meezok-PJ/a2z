@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block body_class %}page-login{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <div class="auth-logo-wrap">
+    <img class="auth-logo" src="/branding/logo" alt="A2Z logo">
+  </div>
+
+  <div id="step-auth" class="flow-step">
+    <h1>Sign in</h1>
+    <p class="subtext">Access your A2Z vault.</p>
+
+    <label class="auth-label" for="username">Username</label>
+    <div class="auth-input" data-input-wrap>
+      <span class="auth-input-icon" aria-hidden="true"><i data-feather="user"></i></span>
+      <input id="username" type="text" autocomplete="username" inputmode="text" spellcheck="false" placeholder="Enter your username" />
+    </div>
+
+    <button id="username-next" type="button" class="auth-primary-btn btn-with-icon">
+      <i data-feather="log-in" aria-hidden="true"></i>
+      <span>Continue</span>
+    </button>
+
+    <button id="need-help" type="button" class="auth-help-link link-inline">
+      <i data-feather="help-circle" aria-hidden="true"></i>
+      <span>Need help?</span>
+    </button>
+
+    <div id="auth-inline" class="hidden">
+      <div id="inline-setup" class="hidden">
+        <h2 class="auth-inline-title">Create master password</h2>
+        <p class="subtext">This encrypts your vault locally. Keep it safe.</p>
+
+        <label class="auth-label" for="setup-password">Master password</label>
+        <div class="auth-input auth-input--password" data-input-wrap>
+          <span class="auth-input-icon" aria-hidden="true"><i data-feather="lock"></i></span>
+          <input id="setup-password" type="password" autocomplete="new-password" placeholder="Create a master password" />
+          <button type="button" class="auth-input-action" data-password-toggle data-password-target="setup-password" aria-label="Show password">
+            <i data-feather="eye" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <label class="auth-label" for="setup-confirm">Confirm password</label>
+        <div class="auth-input auth-input--password" data-input-wrap>
+          <span class="auth-input-icon" aria-hidden="true"><i data-feather="lock"></i></span>
+          <input id="setup-confirm" type="password" autocomplete="new-password" placeholder="Repeat the master password" />
+          <button type="button" class="auth-input-action" data-password-toggle data-password-target="setup-confirm" aria-label="Show password">
+            <i data-feather="eye" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <button id="setup-submit" type="button" class="auth-primary-btn btn-with-icon">
+          <i data-feather="check-circle" aria-hidden="true"></i>
+          <span>Create</span>
+        </button>
+      </div>
+
+      <div id="inline-password" class="hidden">
+        <h2 class="auth-inline-title">Master password</h2>
+        <p class="subtext">Decrypt and unlock your vault.</p>
+
+        <label class="auth-label" for="login-password">Password</label>
+        <div class="auth-input auth-input--password" data-input-wrap>
+          <span class="auth-input-icon" aria-hidden="true"><i data-feather="lock"></i></span>
+          <input id="login-password" type="password" autocomplete="current-password" placeholder="Enter your master password" />
+          <button type="button" class="auth-input-action" data-password-toggle data-password-target="login-password" aria-label="Show password">
+            <i data-feather="eye" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <button id="password-next" type="button" class="auth-primary-btn btn-with-icon">
+          <i data-feather="log-in" aria-hidden="true"></i>
+          <span>Sign in</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="recovery-panel" class="auth-recovery hidden" aria-live="polite">
+      <div class="auth-recovery-header">
+        <h2 class="auth-inline-title">Recovery</h2>
+        <button id="recovery-close" type="button" class="auth-secondary-btn ghost-btn">Close</button>
+      </div>
+
+      <div class="auth-recovery-actions">
+        <button id="recovery-path-token" type="button" class="auth-secondary-btn ghost-btn">I still have my 2FA token</button>
+        <button id="recovery-path-admin" type="button" class="auth-secondary-btn ghost-btn">I lost master password and 2FA token</button>
+      </div>
+
+      <div id="recovery-token" class="hidden">
+        <p class="subtext">Verify your token, then set a new master password.</p>
+        <label class="auth-label" for="recovery-totp">TOTP code</label>
+        <div class="auth-input" data-input-wrap>
+          <span class="auth-input-icon" aria-hidden="true"><i data-feather="shield"></i></span>
+          <input id="recovery-totp" type="text" inputmode="numeric" maxlength="8" autocomplete="one-time-code" placeholder="Enter authentication code" />
+        </div>
+
+        <label class="auth-label" for="recovery-password">New master password</label>
+        <div class="auth-input auth-input--password" data-input-wrap>
+          <span class="auth-input-icon" aria-hidden="true"><i data-feather="lock"></i></span>
+          <input id="recovery-password" type="password" autocomplete="new-password" placeholder="Create a new master password" />
+          <button type="button" class="auth-input-action" data-password-toggle data-password-target="recovery-password" aria-label="Show password">
+            <i data-feather="eye" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <label class="auth-label" for="recovery-confirm">Confirm new password</label>
+        <div class="auth-input auth-input--password" data-input-wrap>
+          <span class="auth-input-icon" aria-hidden="true"><i data-feather="lock"></i></span>
+          <input id="recovery-confirm" type="password" autocomplete="new-password" placeholder="Repeat the new master password" />
+          <button type="button" class="auth-input-action" data-password-toggle data-password-target="recovery-confirm" aria-label="Show password">
+            <i data-feather="eye" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <button id="recovery-token-submit" type="button" class="auth-primary-btn btn-with-icon">
+          <i data-feather="refresh-cw" aria-hidden="true"></i>
+          <span>Reset master password</span>
+        </button>
+      </div>
+
+      <div id="recovery-admin" class="hidden">
+        <p class="subtext">Submit a request for admin review.</p>
+        <label class="auth-label" for="recovery-reason">Reason</label>
+        <div class="auth-input" data-input-wrap>
+          <span class="auth-input-icon" aria-hidden="true"><i data-feather="file-text"></i></span>
+          <input id="recovery-reason" type="text" maxlength="140" placeholder="Short reason (optional)" />
+        </div>
+        <button id="recovery-admin-submit" type="button" class="auth-primary-btn btn-with-icon">
+          <i data-feather="send" aria-hidden="true"></i>
+          <span>Request admin reset</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="step-totp" class="flow-step hidden">
+    <div class="totp-hero-icon">
+      <i data-feather="shield" aria-hidden="true"></i>
+    </div>
+    <h1 id="totp-title">2FA</h1>
+    <p id="totp-subtext" class="subtext">Enter your authenticator code to continue.</p>
+
+    <div id="totp-choice" class="totp-choice-actions hidden">
+      <button id="totp-enable-now" type="button" class="auth-primary-btn btn-with-icon totp-choice-btn">
+        <i data-feather="shield" aria-hidden="true"></i>
+        <span>Enable 2FA now</span>
+      </button>
+      <button id="totp-skip-now" type="button" class="auth-secondary-btn ghost-btn totp-skip-btn">
+        <i data-feather="skip-forward" aria-hidden="true"></i>
+        <span>Skip for now</span>
+      </button>
+    </div>
+
+    <div id="qr-wrap" class="totp-qr-card hidden">
+      <div class="totp-qr-inner">
+        <img id="totp-qr" alt="TOTP QR code">
+      </div>
+      <p class="totp-qr-hint">Scan with Google Authenticator, Authy, or any TOTP app</p>
+    </div>
+
+    <label class="auth-label hidden" id="totp-code-label" for="totp-digit-0">Verification Code</label>
+    <div class="totp-code-boxes hidden" id="totp-code-wrap">
+      <input class="totp-digit" id="totp-digit-0" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1" />
+      <input class="totp-digit" id="totp-digit-1" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+      <input class="totp-digit" id="totp-digit-2" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+      <span class="totp-digit-sep" aria-hidden="true">–</span>
+      <input class="totp-digit" id="totp-digit-3" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+      <input class="totp-digit" id="totp-digit-4" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+      <input class="totp-digit" id="totp-digit-5" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+    </div>
+    <!-- Hidden real input for JS to read the combined code -->
+    <input id="totp-code" type="hidden" />
+
+    <button id="totp-submit" type="button" class="auth-primary-btn btn-with-icon hidden">
+      <i data-feather="check-circle" aria-hidden="true"></i>
+      <span>Verify</span>
+    </button>
+    <button id="lost-authenticator" type="button" class="link-inline hidden">Need help?</button>
+    <button id="totp-back" type="button" class="auth-secondary-btn ghost-btn hidden">
+      <i data-feather="arrow-left" aria-hidden="true"></i>
+      <span>Back</span>
+    </button>
+  </div>
+
+  <p id="auth-message" class="message"></p>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2-bundled.min.js" integrity="sha384-XOR3aNvHciLPIf6r+2glkrmbBbLmIJ1EChMXjw8eBKBf8gE0rDq1TyUNuRdorOqi" crossorigin="anonymous"></script>
+<script defer src="{{ url_for('static', filename='js/crypto.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}

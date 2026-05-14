@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block body_class %}page-vault{% endblock %}
+{% block shell_class %}app-shell--dashboard{% endblock %}
+{% block content %}
+<div class="vault-dashboard">
+  <header class="vault-nav">
+    <div class="vault-nav-left">
+      <a class="vault-logo-link" href="/vault" aria-label="Project A2Z">
+        <img class="vault-logo-image" src="{{ url_for('web.branding_logo') }}" alt="Project A2Z Logo">
+      </a>
+      <nav class="vault-tabs" aria-label="Security Navigation">
+        <a class="vault-tab" href="/vault">Vault</a>
+        <a class="vault-tab vault-tab-active" href="/security">Security</a>
+        <span class="vault-tab-underline" aria-hidden="true"></span>
+      </nav>
+    </div>
+  </header>
+
+  <section class="vault-content security-page" aria-label="Security Settings">
+    <div class="vault-content-header">
+      <div>
+        <h1 class="vault-title">Security Settings</h1>
+        <p class="vault-subtitle">Manage optional TOTP-based 2FA for your account.</p>
+      </div>
+    </div>
+
+    <div class="admin-panel-card security-card">
+      <div class="security-status-row">
+        <div class="totp-hero-icon totp-hero-icon--small">
+          <i data-feather="shield" aria-hidden="true"></i>
+        </div>
+        <div class="security-status-info">
+          <p class="security-status-label">Two-Factor Authentication</p>
+          <span id="security-2fa-status" class="admin-pill admin-pill-alert">Loading...</span>
+        </div>
+      </div>
+
+      <div id="security-2fa-actions" class="security-actions">
+        <button id="security-enable-2fa" type="button" class="vault-primary-btn btn-with-icon">
+          <i data-feather="shield" aria-hidden="true"></i>
+          <span>Enable 2FA</span>
+        </button>
+        <button id="security-disable-2fa" type="button" class="vault-secondary-btn btn-with-icon hidden">
+          <i data-feather="shield-off" aria-hidden="true"></i>
+          <span>Disable 2FA</span>
+        </button>
+      </div>
+
+      <div id="security-2fa-setup" class="security-setup hidden">
+        <div class="totp-qr-card">
+          <div class="totp-qr-inner">
+            <img id="security-totp-qr" alt="TOTP QR code for account setup">
+          </div>
+          <p class="totp-qr-hint">Scan with Google Authenticator, Authy, or any TOTP app</p>
+        </div>
+
+        <label class="auth-label" for="sec-totp-digit-0">Verification Code</label>
+        <div class="totp-code-boxes" id="security-totp-code-wrap">
+          <input class="totp-digit sec-totp-digit" id="sec-totp-digit-0" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
+          <input class="totp-digit sec-totp-digit" id="sec-totp-digit-1" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+          <input class="totp-digit sec-totp-digit" id="sec-totp-digit-2" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+          <span class="totp-digit-sep" aria-hidden="true">–</span>
+          <input class="totp-digit sec-totp-digit" id="sec-totp-digit-3" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+          <input class="totp-digit sec-totp-digit" id="sec-totp-digit-4" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+          <input class="totp-digit sec-totp-digit" id="sec-totp-digit-5" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+        </div>
+        <input id="security-totp-code" type="hidden" />
+
+        <div class="security-setup-actions">
+          <button id="security-confirm-2fa" type="button" class="vault-primary-btn btn-with-icon">
+            <i data-feather="check-circle" aria-hidden="true"></i>
+            <span>Confirm and enable</span>
+          </button>
+          <button id="security-cancel-setup" type="button" class="vault-secondary-btn btn-with-icon">
+            <i data-feather="x" aria-hidden="true"></i>
+            <span>Cancel</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="security-2fa-disable" class="security-setup hidden">
+        <p class="security-disable-warn">Enter your current authenticator code to confirm disabling 2FA.</p>
+        <label class="auth-label" for="sec-dis-digit-0">Verification Code</label>
+        <div class="totp-code-boxes" id="security-disable-code-wrap">
+          <input class="totp-digit sec-dis-digit" id="sec-dis-digit-0" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
+          <input class="totp-digit sec-dis-digit" id="sec-dis-digit-1" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+          <input class="totp-digit sec-dis-digit" id="sec-dis-digit-2" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+          <span class="totp-digit-sep" aria-hidden="true">–</span>
+          <input class="totp-digit sec-dis-digit" id="sec-dis-digit-3" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+          <input class="totp-digit sec-dis-digit" id="sec-dis-digit-4" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+          <input class="totp-digit sec-dis-digit" id="sec-dis-digit-5" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+        </div>
+        <input id="security-disable-code" type="hidden" />
+
+        <div class="security-setup-actions">
+          <button id="security-confirm-disable" type="button" class="vault-secondary-btn btn-with-icon">
+            <i data-feather="shield-off" aria-hidden="true"></i>
+            <span>Confirm disable</span>
+          </button>
+          <button id="security-cancel-disable" type="button" class="vault-secondary-btn btn-with-icon">
+            <i data-feather="x" aria-hidden="true"></i>
+            <span>Cancel</span>
+          </button>
+        </div>
+      </div>
+
+      <p id="security-message" class="message vault-message"></p>
+    </div>
+  </section>
+</div>
+
+<script defer src="{{ url_for('static', filename='js/security-settings.js') }}"></script>
+{% endblock %}
