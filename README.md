@@ -1,6 +1,6 @@
 # A2Z Organizational Password Manager
 ---
-![a2z_logo](a2z_logo_removebg-preview.png)
+![a2z_logo](a2z_logo-removebg-preview.png)
 
 Welcome to the A2Z Organizational Password Manager. A2Z is a secure, zero-trust password management solution designed for organizational use, featuring advanced cryptographic architecture and seamless user experiences.
 
